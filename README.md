@@ -33,3 +33,12 @@ artifacts on gradlePluginPortal() and mavenCentral() respectively.
 You can use sourceSets just like with the Java plugin. You can add new folders, resource folders, 
 and configure the xtcCompile and xtcRun extensions to do anything that is possible to tell the
 existing "xcc" and "xec" launchers.
+
+## TODO
+
+* Dockerize
+* Industry standard release support and likely install scripts from an Application Plugin task instead of binary launcher. 
+* Same for distribution support. 
+* Move XDK lib dirs into the xdk
+* 
+Right now a standard release model and an xtc publication SoftwareComponent needs to be completed, as well as a 
