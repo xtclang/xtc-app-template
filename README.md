@@ -5,7 +5,8 @@ This template can be used to create a simple XTC app. It is a good starting poin
 ## TL;DR - I just want to build this
 
 1) git clone git@github.com:xtclang/xvm.git (close the XVM repo to another place on your dev machine)
-2) In the xvm repo root, execute ./gradlew installInitScripts (this will set up a config under $GRADLE_USER_HOME
+2) git checkout xtc-plugin (This will be merged to master soon and you can skip this step)
+3) In the xvm repo root, execute ./gradlew installInitScripts (this will set up a config under $GRADLE_USER_HOME
    that provides read-only, package-only credentials, and lets the project resolve our GitHub Maven Artifact Repo.
 3) In THIS repo, in the root, do ./gradlew greet
 
@@ -13,7 +14,7 @@ Alternatively:
 
 Replace step 2) in the above descrption with.
 
-2) In the xvm repo root, execute ./gradlew publishLocal (this will publish the latest artifacts in your local Maven repository)
+3) In the xvm repo root, execute ./gradlew publishLocal (this will publish the latest artifacts in your local Maven repository)
 
 ### Bootstrapping repos (will go away later) 
 
