@@ -1,17 +1,7 @@
-module HelloWorldFizzBuzz {
-    void run() {
+module HelloWorld {
+    void run(String[] args = []) {
         @Inject Console console;
-        for (Int x : 1..100) {
-            console.print(
-                switch (x % 3, x % 5) {
-                case (0, 0): "FizzBuzz";
-                case (0, _): "Fizz";
-                case (_, 0): "Buzz";
-                case (_, _): x.toString();
-                }, True);
-            console.print(" ", True);
-        }
-        console.print();
-        console.print("Hello, World!");
+        //assert:debug;
+        console.print($"{args[0]}{args[1]}{args[2]}!");
     }
 }
