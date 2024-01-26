@@ -33,7 +33,6 @@ AND/OR:
 ### Building the app
 
 ```
-./gradlew build [--scan]
 ./gradlew build [--scan] [--stacktrace]
 ```
 
