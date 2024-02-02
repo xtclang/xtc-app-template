@@ -15,10 +15,8 @@ This template can be used to create a simple XTC app. It is a good starting poin
 
 #### ... and/or as a self contained project
 
-1) Understand why you need a GitHub personal access token (for now), to refer to XDK Maven artifacts, by reading   
-   the comment at the top of settings.gradle.kts in the repo root.
-2) Set up a GitHub classic personal access token with read:package privileges for the `xtclang.org` Maven
-   package repository on GitHub.
+1) Understand why you need a GitHub personal access token (for now), to refer to XDK Maven artifacts, by reading the comment at the top of settings.gradle.kts in the repo root.
+2) Set up a GitHub classic personal access token with read:package privileges for the `xtclang.org` Maven package repository on GitHub.
    
    Click your user Settings -> Developer Settings -> Personal Access Tokens -> Tokens (Classic) (or go 
    to: https://github.com/settings/tokens). Create an access token with at least `read:packages` privileges,
