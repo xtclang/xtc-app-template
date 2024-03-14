@@ -60,24 +60,43 @@
  * as well. And you only have to do this once.
  */
 pluginManagement {
+    val xtcVersion: String by settings
+
     repositories {
-        maven {
-            val gitHubUrl: String by settings
-            val gitHubUser: String by settings
-            val gitHubToken: String by settings
-            url = uri(gitHubUrl)
-            credentials {
-                username = gitHubUser
-                password = gitHubToken
+        val mavenLocalRepo: String? by settings
+        val xtclangGitHubRepo: String? by settings
+
+        val gitHubUser: String? by settings
+        val gitHubToken: String? by settings
+        val gitHubUrl: String by settings
+
+        println("*** Plugin: mavenLocal=$mavenLocalRepo, xtclangGitHubRepo=$xtclangGitHubRepo, version: $xtcVersion")
+        if (mavenLocalRepo != "true" && xtclangGitHubRepo != "true") {
+            throw GradleException("Error: either or both of mavenResolveFromMavenLocal and mavenResolveFromXtcGitHub must be set.")
+        }
+
+        if (xtclangGitHubRepo == "true") {
+            println("Adding github repo: gitHubUser=$gitHubUser, gitHubUrl=$gitHubUrl")
+            maven {
+                url = uri(gitHubUrl)
+                credentials {
+                    username = gitHubUser
+                    password = gitHubToken
+                }
             }
         }
-        if (providers.gradleProperty("allowMavenLocal").getOrElse("false").toBoolean()) {
-            mavenLocal() // also look for XVM "/.gradlew publishLocal" artifacts in the maven local repo
+
+        if (mavenLocalRepo == "true") {
+            // Define mavenLocal as an artifact repository (disabled by default)
+            mavenLocal()
         }
+
+        // Define Gradle Plugin Portal as a plugin repository
+        gradlePluginPortal()
     }
+
     plugins {
-        val xtcVersion: String by settings
-        id("org.xtclang.xtc-plugin").version(xtcVersion)
+        id("org.xtclang.xtc-plugin") version xtcVersion
     }
 }
 
@@ -85,18 +104,32 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
+        // Define XTC org GitHub Maven as a plugin repository
+        val mavenLocalRepo: String? by settings
+        val xtclangGitHubRepo: String? by settings
+
+        val gitHubUser: String? by settings
+        val gitHubToken: String? by settings
         val gitHubUrl: String by settings
-        val gitHubUser: String by settings
-        val gitHubToken: String by settings
-        maven {
-            url = uri(gitHubUrl)
-            credentials {
-                username = gitHubUser
-                password = gitHubToken
+
+        println("*** Repos: mavenLocal=$mavenLocalRepo, xtclangGitHubRepo=$xtclangGitHubRepo")
+        if (mavenLocalRepo != "true" && xtclangGitHubRepo != "true") {
+            throw GradleException("Error: either or both of mavenResolveFromMavenLocal and mavenResolveFromXtcGitHub must be set.")
+        }
+
+        if (xtclangGitHubRepo == "true") {
+            maven {
+                url = uri(gitHubUrl)
+                credentials {
+                    username = gitHubUser
+                    password = gitHubToken
+                }
             }
         }
-        if (providers.gradleProperty("allowMavenLocal").getOrElse("false").toBoolean()) {
-            mavenLocal() // also look for XVM "/.gradlew publishLocal" artifacts in the maven local repo
+
+        if (mavenLocalRepo == "true") {
+            // Define mavenLocal as an artifact repository (disabled by default)
+            mavenLocal()
         }
     }
 }

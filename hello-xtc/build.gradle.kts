@@ -8,13 +8,8 @@ dependencies {
 }
 
 xtcRun {
-    // To debug, do one of, or a combination of
-    //   1) Set fork to "false", which makes the Gradle task execute in the build process. Run the "greet" task in debug configuration from the Gradle settings
-    //   2) Set up Gradle debug attachment by uncommenting the org.gradle.debug property in gradle.properties. Attach to process from IntelliJ
-    //   3) Run Gradle with --no-daemon, to get everything to happen in the build thread.
-    //   4) Use the org.gradle.debug=true flag in your configuration. See the Gradle User Guide, and gradle.properties in the repo root for more info.
-    fork = false // Set to "false" to launch xec in the build thread, so that we can seamlessly debug our way into it with the IDE.
-
+    // Set debug to "true" if you want the spawned runners to suspend and wait for a debugger to attach.
+    debug = false
     // To run more modules in sequence, you can add more module sections after this one.
     module {
         moduleName = "HelloWorld"
