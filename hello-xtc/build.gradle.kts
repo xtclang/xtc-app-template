@@ -33,5 +33,6 @@ xtcRun {
  */
 val greet by tasks.registering {
     group = "application"
+    description = "Publish a greeting, directed to the contents of the 'entityToGreet' property. If no such property exists, we will greet 'World'."
     dependsOn(tasks.runXtc)
 }
