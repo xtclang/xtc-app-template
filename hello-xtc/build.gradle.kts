@@ -1,16 +1,17 @@
+import org.xtclang.plugin.tasks.XtcVersionTask
+
 plugins {
-    id("org.xtclang.xtc-plugin")
+    alias(libs.plugins.xtc)
 }
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(25))
+        languageVersion.set(JavaLanguageVersion.of(libs.versions.java.get().toInt()))
     }
 }
 
 dependencies {
-    val xtcVersion: String by properties
-    xdkDistribution("org.xtclang:xdk:$xtcVersion")
+    xdkDistribution(libs.xdk)
 }
 
 xtcRun {
@@ -21,6 +22,17 @@ xtcRun {
         moduleName = "HelloWorld"
         moduleArgs("Hello ", "there, ")
         moduleArg(providers.gradleProperty("entityToGreet").getOrElse("World"))
+    }
+}
+
+// Print version information
+val printVersionInfo by tasks.registering {
+    val xtcVersionTask = tasks.named<XtcVersionTask>("xtcVersion")
+    dependsOn(xtcVersionTask)
+    val xdkVersion = xtcVersionTask.flatMap { it.xdkVersion }
+    val semanticVersion = xtcVersionTask.flatMap { it.semanticVersion }
+    doLast {
+        println("XDK Version from task: ${xdkVersion.get()} (semantic version: ${semanticVersion.get()})")
     }
 }
 
@@ -40,5 +52,5 @@ xtcRun {
 val greet by tasks.registering {
     group = "application"
     description = "Publish a greeting, directed to the contents of the 'entityToGreet' property. If no such property exists, we will greet 'World'."
-    dependsOn(tasks.runXtc)
+    dependsOn(printVersionInfo, tasks.runXtc)
 }

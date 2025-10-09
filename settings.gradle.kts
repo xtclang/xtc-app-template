@@ -5,13 +5,12 @@
  * for snapshot artifacts.
  */
 pluginManagement {
-    val xtcVersion: String by settings
     val localOnly: String by settings
 
     repositories {
-        println("*** Plugin: version: $xtcVersion, localOnly: $localOnly")
         if (localOnly.toBoolean()) {
             // Use only Maven Local for XTC plugin/XDK, but keep Plugin Portal for Gradle plugins
+            println("WARNING: Will only use Maven Local for XTC plugin/XDK artifacts.")
             mavenLocal()
             gradlePluginPortal()
             return@repositories
@@ -26,9 +25,6 @@ pluginManagement {
         mavenCentral() // Maven Central for release XDK artifacts
         gradlePluginPortal() // Gradle Plugin Portal for release plugin artifacts
         mavenLocal() // Maven Local for local development (checked last)
-    }
-    plugins {
-        id("org.xtclang.xtc-plugin") version xtcVersion
     }
 }
 
