@@ -6,35 +6,95 @@ This template can be used to create a simple XTC app. It is a good starting poin
 
 ### Set up the Environment
 
-#### ... From a clone of the XVM repository
+#### XTC Version Configuration
 
-1) Execute `git clone https://github.com/xtclang/xvm.git <xvmdir>` (close the XVM repo to another place on 
-   your dev machine)
-2) In the `<xvmdir>` Execute `./gradlew publishLocal` to publish the XDK artifacts to the local maven repository
-   on your dev machine (typically `$HOME/.m2`)
+The XTC plugin and XDK version is specified in `gradle.properties`:
 
-#### ... and/or as a self contained project
+```properties
+xtcVersion=0.4.4-SNAPSHOT
+```
 
-1) Understand why you need a GitHub personal access token (for now), to refer to XDK Maven artifacts, by reading the comment at the top of settings.gradle.kts in the repo root.
-2) Set up a GitHub classic personal access token with read:package privileges for the `xtclang.org` Maven package repository on GitHub.
-   
-   Click your user Settings -> Developer Settings -> Personal Access Tokens -> Tokens (Classic) (or go 
-   to: https://github.com/settings/tokens). Create an access token with at least `read:packages` privileges,
-   if you don't have one already with that (and possibly more). Copy and paste the token to
-   `$GRADLE_USER_HOME/gradle.properties` as a separate line on the form `gitHubToken=<token>`. While you are 
-   in there, add a line with `gitHubUser=<your github username>` too. 
+You can use either:
+- **Release versions**: `xtcVersion=0.4.3` (specific released version)
+- **Snapshot versions**: `xtcVersion=0.4.4-SNAPSHOT` (latest development snapshot)
 
-   *(This step will go away soon, at least for release artifacts (frequently updated snapshot artifacts may
-    remain on GitHub), and you will soon be able to just configure your repositories in the settings file as
-   `gradlePluginPortal()` and `mavenCentral()`)*
+#### Dependency Resolution Order
 
-   `$GRADLE_USER_HOME`, referred to in this step, is typically set to be `<your home directory>/.gradle`.
+The build is configured to search for XTC artifacts in the following order:
+
+1. **Maven Central Snapshots** (`https://central.sonatype.com/repository/maven-snapshots/`)
+   - Checked first for SNAPSHOT versions
+   - Provides the latest published development builds
+   - Updated automatically when new snapshots are published
+
+2. **Maven Central** (`mavenCentral()`)
+   - Used for release versions
+   - Official releases of XTC artifacts
+
+3. **mavenLocal** (`~/.m2/repository/`) - Local Maven repository
+   - Checked last as a fallback
+   - Used when you've built and published the XVM repository locally using `./gradlew publishLocal`
+   - Useful for testing local changes before they're published
+
+This configuration prioritizes published artifacts while still allowing local development builds as a fallback.
+
+#### Working with a Local XVM Repository Build (Optional)
+
+If you want to develop against a local build of the XVM repository:
+
+1) Execute `git clone https://github.com/xtclang/xvm.git <xvmdir>`
+2) In `<xvmdir>`, execute `./gradlew publishLocal` to publish the XDK artifacts to your local maven repository (typically `$HOME/.m2`)
+3) Since remote snapshots are checked first, your local build will only be used if it's not found remotely
+
+#### Forcing Dependency Re-resolution
+
+Gradle caches dependency resolution results, including which repository was used. You may need to refresh dependencies when:
+
+- **Switching between local and remote builds**: After publishing locally with `./gradlew publishLocal`, or after a new snapshot is published remotely
+- **Getting the latest snapshot**: When you know a newer snapshot has been published to Maven Central Snapshots
+- **Troubleshooting dependency issues**: When dependencies seem stale or you're getting unexpected versions
+
+To force Gradle to re-resolve dependencies and check all repositories:
+
+```bash
+./gradlew build --refresh-dependencies
+```
+
+This will:
+- Clear Gradle's cached dependency metadata
+- Re-check all configured repositories in order
+- Download the latest snapshots if available
+
+You can combine this with the resolution verification script to see what's being resolved:
+
+```bash
+./gradlew build --refresh-dependencies -I gradle/init.d/show-resolution.gradle.kts
+```
 
 ### Building the app
 
 ```
 ./gradlew build [--scan] [--stacktrace]
 ```
+
+### Verifying Dependency Resolution Sources
+
+To see where the XTC plugin and XDK dependencies are being resolved from (mavenLocal, mavenCentral, or Maven Central Snapshots), you can run any Gradle command with the included init script:
+
+```bash
+./gradlew build -I gradle/init.d/show-resolution.gradle.kts
+```
+
+The `-I` flag tells Gradle to apply the init script for that specific build. This will output lines showing the repository source for each XTC dependency, for example:
+
+```
+*** Resolved: org.xtclang:xtc-plugin:0.4.4-SNAPSHOT from repository: maven
+*** Resolved: org.xtclang:xdk:0.4.4-SNAPSHOT from repository: maven
+```
+
+This is useful when working with both local XVM repository builds and published artifacts to verify which version is being used.
+
+**Note**: The init script is located in `gradle/init.d/` but is intentionally not applied automatically to avoid cluttering normal build output. Use the `-I` flag when you need to verify dependency sources.
 
 ### Running the app 
 

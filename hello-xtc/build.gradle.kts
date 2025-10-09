@@ -2,6 +2,12 @@ plugins {
     id("org.xtclang.xtc-plugin")
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(25))
+    }
+}
+
 dependencies {
     val xtcVersion: String by properties
     xdkDistribution("org.xtclang:xdk:$xtcVersion")
