@@ -62,6 +62,61 @@ cd xvm
 ./gradlew publishLocal
 ```
 
+### Using GitHub Packages
+
+To use GitHub Packages as a repository source for the XTC plugin and XDK, add the following to your `settings.gradle.kts`:
+
+```kotlin
+pluginManagement {
+    repositories {
+        maven {
+            url = uri("https://maven.pkg.github.com/xtclang/xvm")
+            credentials {
+                username = providers.gradleProperty("gpr.user")
+                    .orElse(providers.environmentVariable("GITHUB_ACTOR")).get()
+                password = providers.gradleProperty("gpr.token")
+                    .orElse(providers.environmentVariable("GITHUB_TOKEN")).get()
+            }
+        }
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        maven {
+            url = uri("https://maven.pkg.github.com/xtclang/xvm")
+            credentials {
+                username = providers.gradleProperty("gpr.user")
+                    .orElse(providers.environmentVariable("GITHUB_ACTOR")).get()
+                password = providers.gradleProperty("gpr.token")
+                    .orElse(providers.environmentVariable("GITHUB_TOKEN")).get()
+            }
+        }
+        mavenCentral()
+    }
+}
+```
+
+Then set your credentials either in `gradle.properties` (never commit this file with credentials!):
+```properties
+gpr.user=your-github-username
+gpr.token=your-github-personal-access-token
+```
+
+Or use environment variables:
+```bash
+export GITHUB_ACTOR=your-github-username
+export GITHUB_TOKEN=your-github-personal-access-token
+./gradlew build
+```
+
+To create a GitHub Personal Access Token:
+1. Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
+2. Click "Generate new token (classic)"
+3. Select scope: `read:packages`
+4. Generate and copy the token
+
 ### Refreshing Dependencies
 
 To force Gradle to re-resolve dependencies:

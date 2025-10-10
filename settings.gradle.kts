@@ -4,14 +4,18 @@
  * This configuration uses Maven Central for release artifacts and Maven Snapshots
  * for snapshot artifacts.
  */
+
 pluginManagement {
     val localOnly: String by settings
 
     repositories {
         if (localOnly.toBoolean()) {
-            // Use only Maven Local for XTC plugin/XDK, but keep Plugin Portal for Gradle plugins
-            println("WARNING: Will only use Maven Local for XTC plugin/XDK artifacts.")
-            mavenLocal()
+            mavenLocal {
+                content {
+                    includeGroup("org.xtclang")
+                    includeGroup("org.xtclang.xtc-plugin") // Gradle plugin marker artifact
+                }
+            }
             gradlePluginPortal()
             return@repositories
         }
@@ -24,7 +28,12 @@ pluginManagement {
         }
         mavenCentral() // Maven Central for release XDK artifacts
         gradlePluginPortal() // Gradle Plugin Portal for release plugin artifacts
-        mavenLocal() // Maven Local for local development (checked last)
+        mavenLocal {
+            content {
+                includeGroup("org.xtclang")
+                includeGroup("org.xtclang.xtc-plugin") // Gradle plugin marker artifact
+            }
+        }
     }
 }
 
@@ -38,8 +47,11 @@ dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         if (localOnly.toBoolean()) {
-            // Use only Maven Local for local development
-            mavenLocal()
+            mavenLocal {
+                content {
+                    includeGroup("org.xtclang")
+                }
+            }
             return@repositories
         }
         // Maven Central Snapshots for snapshot artifacts (check first for SNAPSHOT versions)
@@ -51,9 +63,12 @@ dependencyResolutionManagement {
         }
         // Maven Central for release artifacts
         mavenCentral()
-
         // Maven Local for local development (checked last)
-        mavenLocal()
+        mavenLocal {
+            content {
+                includeGroup("org.xtclang")
+            }
+        }
     }
 }
 
