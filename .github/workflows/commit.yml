@@ -16,7 +16,6 @@ jobs:
 
     env:
       PERSON: Bjarne Stroustrup
-      ORG_GRADLE_PROJECT_entityToGreet: Bjarne Stroustrup
 
     steps:
     - name: Checkout code
@@ -37,11 +36,11 @@ jobs:
         cache-read-only: ${{ github.ref != 'refs/heads/master' }}
 
     - name: Build with Gradle
-      run: ./gradlew build --refresh-dependencies
+      run: ORG_GRADLE_PROJECT_entityToGreet="$PERSON" ./gradlew build --refresh-dependencies
 
     - name: Run greet task and verify output
       run: |
-        ./gradlew greet | tee output.log
+        ORG_GRADLE_PROJECT_entityToGreet="$PERSON" ./gradlew greet | tee output.log
         if ! grep -q "$PERSON" output.log; then
           echo "Error: Expected '$PERSON' not found in output"
           cat output.log
