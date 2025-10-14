@@ -16,7 +16,7 @@ jobs:
 
     env:
       PERSON: Bjarne Stroustrup
-      ORG_GRADLE_PROJECT_entityToGreet: ${{ env.PERSON }}
+      ORG_GRADLE_PROJECT_entityToGreet: Bjarne Stroustrup
 
     steps:
     - name: Checkout code
