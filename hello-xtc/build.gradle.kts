@@ -10,12 +10,6 @@ if (localOnly.toBoolean()) {
     logger.warn("WARNING: Will only use Maven Local for XTC plugin/XDK artifacts.")
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(libs.versions.java.get().toInt()))
-    }
-}
-
 dependencies {
     xdkDistribution(libs.xdk)
 }
