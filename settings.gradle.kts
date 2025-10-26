@@ -1,38 +1,23 @@
 /**
- * settings.gradle.kts is used for bootstrapping a build.
+ * Settings configuration for XTC projects.
  *
- * This configuration uses Maven Central for release artifacts and Maven Snapshots
- * for snapshot artifacts.
+ * Set localOnly=true in gradle.properties to use only mavenLocal for development.
+ * Otherwise, resolves from Maven Central (releases) and Maven Central Snapshots (snapshots).
  */
 
 pluginManagement {
     val localOnly: String by settings
-
     repositories {
         if (localOnly.toBoolean()) {
-            mavenLocal {
-                content {
-                    includeGroup("org.xtclang")
-                    includeGroup("org.xtclang.xtc-plugin") // Gradle plugin marker artifact
-                }
-            }
+            mavenLocal { content { includeGroup("org.xtclang") } }
             gradlePluginPortal()
-            return@repositories
-        }
-        // Maven Central Snapshots for snapshot artifacts (check first for SNAPSHOT versions)
-        maven {
-            url = uri("https://central.sonatype.com/repository/maven-snapshots/")
-            mavenContent {
-                snapshotsOnly()
+        } else {
+            maven("https://central.sonatype.com/repository/maven-snapshots/") {
+                mavenContent { snapshotsOnly() }
             }
-        }
-        mavenCentral() // Maven Central for release XDK artifacts
-        gradlePluginPortal() // Gradle Plugin Portal for release plugin artifacts
-        mavenLocal {
-            content {
-                includeGroup("org.xtclang")
-                includeGroup("org.xtclang.xtc-plugin") // Gradle plugin marker artifact
-            }
+            mavenCentral()
+            gradlePluginPortal()
+            mavenLocal { content { includeGroup("org.xtclang") } }
         }
     }
 }
@@ -41,39 +26,22 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
+@Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
     val localOnly: String by settings
-
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         if (localOnly.toBoolean()) {
-            mavenLocal {
-                content {
-                    includeGroup("org.xtclang")
-                }
+            mavenLocal { content { includeGroup("org.xtclang") } }
+        } else {
+            maven("https://central.sonatype.com/repository/maven-snapshots/") {
+                mavenContent { snapshotsOnly() }
             }
-            return@repositories
-        }
-        // Maven Central Snapshots for snapshot artifacts (check first for SNAPSHOT versions)
-        maven {
-            url = uri("https://central.sonatype.com/repository/maven-snapshots/")
-            mavenContent {
-                snapshotsOnly()
-            }
-        }
-        // Maven Central for release artifacts
-        mavenCentral()
-        // Maven Local for local development (checked last)
-        mavenLocal {
-            content {
-                includeGroup("org.xtclang")
-            }
+            mavenCentral()
+            mavenLocal { content { includeGroup("org.xtclang") } }
         }
     }
 }
 
-// Set the name of the main project.
 rootProject.name = "HelloXtc"
-
-// Point out the build file for the main project.
 include("hello-xtc")
