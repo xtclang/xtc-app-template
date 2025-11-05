@@ -15,8 +15,10 @@ dependencies {
 }
 
 xtcRun {
-    // Set debug to "true" if you want the spawned runners to suspend and wait for a debugger to attach.
-    debug = false
+    // Set detach to true to run the module in a background process that continues after Gradle exits.
+    // Output will be redirected to a timestamped log file in the project directory.
+    // detach = true
+
     // To run more modules in sequence, you can add more module sections after this one.
     module {
         moduleName = "HelloWorld"

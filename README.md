@@ -119,7 +119,37 @@ To create a GitHub Personal Access Token:
 
 ### Refreshing Dependencies
 
-To force Gradle to re-resolve dependencies:
+Gradle caches resolved dependencies to improve build performance. However, when working with SNAPSHOT versions or local development, you may need to force Gradle to re-download artifacts.
+
+#### Why Use --refresh-dependencies
+
+Use `--refresh-dependencies` when:
+- **Working with SNAPSHOT versions**: SNAPSHOTs can be updated at any time, and Gradle's cache may contain an older version
+- **Local development**: After running `./gradlew publishLocal` in the XVM repository to update local artifacts
+- **Switching between repositories**: When changing between Maven Local, Maven Central, and other repositories
+- **Troubleshooting**: When you suspect cached dependencies are causing issues
+
+#### What Happens During --refresh-dependencies
+
+When you run with `--refresh-dependencies`, Gradle will:
+1. **Bypass all caches**: Ignore both local and remote dependency caches
+2. **Re-resolve metadata**: Download fresh POM files and metadata from all configured repositories
+3. **Re-download artifacts**: Fetch new versions of the XTC plugin, XDK distribution, and javatools JAR
+4. **Update checksums**: Verify integrity of all downloaded artifacts
+5. **Rebuild dependency graph**: Recalculate the complete dependency tree
+
+This is especially important when using `localOnly=true` after publishing changes locally:
+```bash
+# In the XVM repository
+./gradlew publishLocal
+
+# In your app template
+./gradlew build --refresh-dependencies -PlocalOnly=true
+```
+
+Without `--refresh-dependencies`, Gradle may continue using older cached versions even after you've published new artifacts locally.
+
+#### Force Refresh Example
 ```bash
 ./gradlew build --refresh-dependencies
 ```
