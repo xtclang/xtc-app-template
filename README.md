@@ -62,9 +62,72 @@ cd xvm
 ./gradlew publishLocal
 ```
 
-### Using GitHub Packages
+Then run your build with:
+```bash
+./gradlew greet -PlocalOnly=true
+```
 
-To use GitHub Packages as a repository source for the XTC plugin and XDK, add the following to your `settings.gradle.kts`:
+### How Gradle Refreshes Dependencies
+
+Understanding how Gradle handles dependency updates is important, especially when working with SNAPSHOT versions or local development.
+
+#### SNAPSHOT vs Release Versions
+
+**SNAPSHOT versions** (e.g., `0.4.4-SNAPSHOT`):
+- Treated as "changing" dependencies that can be updated at any time
+- Gradle automatically checks for updates from **remote** Maven repositories (like Maven Central Snapshots)
+- Default cache TTL: 24 hours for remote repositories
+- **Maven Local is an exception**: Gradle treats Maven Local as a local file cache and does NOT automatically refresh SNAPSHOTs from it
+
+**Release versions** (e.g., `0.4.3`):
+- Treated as immutable - once resolved, Gradle assumes they never change
+- Cached indefinitely unless explicitly refreshed
+- Gradle will not check for updates unless forced with `--refresh-dependencies`
+
+#### When to Use --refresh-dependencies
+
+Use `--refresh-dependencies` to force Gradle to bypass all caches and re-resolve dependencies:
+
+```bash
+./gradlew build --refresh-dependencies
+```
+
+This is necessary when:
+- **Local development with Maven Local**: After running `./gradlew publishLocal` in the XVM repository
+- **Troubleshooting**: When you suspect stale cached dependencies are causing issues
+- **Switching repositories**: After changing repository configurations
+
+Example workflow for local XVM development:
+```bash
+# In the XVM repository - make changes and publish
+cd xvm
+./gradlew publishLocal
+
+# In your app - use the fresh artifacts
+cd your-app
+./gradlew greet -PlocalOnly=true --refresh-dependencies
+```
+
+**Note**: Once you've used `--refresh-dependencies` once after publishing, subsequent builds will pick up the new version automatically (even without the flag) because Gradle now has the correct metadata cached.
+
+### Using Alternative Maven Repositories
+
+This template supports standard Gradle Maven repository configuration. You can add any Maven-compatible repository to `settings.gradle.kts`. See [Appendix: GitHub Packages Example](#appendix-github-packages-example) for a complete example.
+
+### Verifying Dependency Sources
+
+To see where dependencies are being resolved from:
+```bash
+./gradlew build -I gradle/init.d/show-resolution.gradle.kts
+```
+
+---
+
+## Appendix: GitHub Packages Example
+
+This template supports any Maven-compatible repository. Here's an example of configuring GitHub Packages as a repository source for the XTC plugin and XDK.
+
+Add the following to your `settings.gradle.kts`:
 
 ```kotlin
 pluginManagement {
@@ -116,47 +179,3 @@ To create a GitHub Personal Access Token:
 2. Click "Generate new token (classic)"
 3. Select scope: `read:packages`
 4. Generate and copy the token
-
-### Refreshing Dependencies
-
-Gradle caches resolved dependencies to improve build performance. However, when working with SNAPSHOT versions or local development, you may need to force Gradle to re-download artifacts.
-
-#### Why Use --refresh-dependencies
-
-Use `--refresh-dependencies` when:
-- **Working with SNAPSHOT versions**: SNAPSHOTs can be updated at any time, and Gradle's cache may contain an older version
-- **Local development**: After running `./gradlew publishLocal` in the XVM repository to update local artifacts
-- **Switching between repositories**: When changing between Maven Local, Maven Central, and other repositories
-- **Troubleshooting**: When you suspect cached dependencies are causing issues
-
-#### What Happens During --refresh-dependencies
-
-When you run with `--refresh-dependencies`, Gradle will:
-1. **Bypass all caches**: Ignore both local and remote dependency caches
-2. **Re-resolve metadata**: Download fresh POM files and metadata from all configured repositories
-3. **Re-download artifacts**: Fetch new versions of the XTC plugin, XDK distribution, and javatools JAR
-4. **Update checksums**: Verify integrity of all downloaded artifacts
-5. **Rebuild dependency graph**: Recalculate the complete dependency tree
-
-This is especially important when using `localOnly=true` after publishing changes locally:
-```bash
-# In the XVM repository
-./gradlew publishLocal
-
-# In your app template
-./gradlew build --refresh-dependencies -PlocalOnly=true
-```
-
-Without `--refresh-dependencies`, Gradle may continue using older cached versions even after you've published new artifacts locally.
-
-#### Force Refresh Example
-```bash
-./gradlew build --refresh-dependencies
-```
-
-### Verifying Dependency Sources
-
-To see where dependencies are being resolved from:
-```bash
-./gradlew build -I gradle/init.d/show-resolution.gradle.kts
-```

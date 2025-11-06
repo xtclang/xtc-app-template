@@ -2,22 +2,25 @@
  * Settings configuration for XTC projects.
  *
  * Set localOnly=true in gradle.properties to use only mavenLocal for development.
- * Otherwise, resolves from Maven Central (releases) and Maven Central Snapshots (snapshots).
+ * Otherwise, resolves from Maven Central (releases and snapshots).
  */
 
 pluginManagement {
     val localOnly: String by settings
     repositories {
-        if (localOnly.toBoolean()) {
-            mavenLocal { content { includeGroup("org.xtclang") } }
-            gradlePluginPortal()
-        } else {
+        // Add remote Maven repositories unless localOnly mode
+        if (!localOnly.toBoolean()) {
             maven("https://central.sonatype.com/repository/maven-snapshots/") {
                 mavenContent { snapshotsOnly() }
             }
             mavenCentral()
             gradlePluginPortal()
-            mavenLocal { content { includeGroup("org.xtclang") } }
+        }
+        // Always check Maven Local last (or first in localOnly mode)
+        mavenLocal()
+        // Gradle Plugin Portal for standard plugins
+        if (localOnly.toBoolean()) {
+            gradlePluginPortal()
         }
     }
 }
@@ -31,15 +34,15 @@ dependencyResolutionManagement {
     val localOnly: String by settings
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        if (localOnly.toBoolean()) {
-            mavenLocal { content { includeGroup("org.xtclang") } }
-        } else {
+        // Add remote Maven repositories unless localOnly mode
+        if (!localOnly.toBoolean()) {
             maven("https://central.sonatype.com/repository/maven-snapshots/") {
                 mavenContent { snapshotsOnly() }
             }
             mavenCentral()
-            mavenLocal { content { includeGroup("org.xtclang") } }
         }
+        // Always include Maven Local
+        mavenLocal()
     }
 }
 
