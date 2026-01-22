@@ -27,6 +27,15 @@ xtcRun {
     }
 }
 
+// Note: The xtcTest task auto-discovers test modules from src/test/x.
+// No explicit module configuration is needed - just place test modules in
+// the test source set and they will be run as part of the build lifecycle.
+// You can optionally configure test behavior here:
+// xtcTest {
+//     failOnTestFailure = true  // default
+//     // includes/excludes can be used to filter test modules
+// }
+
 // Print version information
 val printVersionInfo by tasks.registering {
     val xtcVersionTask = tasks.named<XtcVersionTask>("xtcVersion")
