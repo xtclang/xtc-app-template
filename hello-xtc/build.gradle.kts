@@ -59,6 +59,11 @@ val printVersionInfo by tasks.registering {
  * ORG_GRADLE_PROJECT_entityToGreet=Dima ./gradlew greet
  *
  * (The task name 'greet' is just an alias, for illustration purposes. You can call runXtc directly.)
+ *
+ * Like Gradle's standard Java application `run` task, `greet` only builds the concrete prerequisites
+ * it needs in order to execute. In a fresh environment that means compile/extract work will run, but
+ * it does not imply the full `build` lifecycle, so `testXtc` still requires `check`, `build`, or an
+ * explicit `testXtc` invocation. This follows normal Gradle least-surprise lifecycle behavior.
  */
 val greet by tasks.registering {
     group = "application"
