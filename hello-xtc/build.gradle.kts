@@ -5,7 +5,7 @@ plugins {
 }
 
 // Warn if using localOnly mode
-val localOnly: String by project
+val localOnly = providers.gradleProperty("localOnly").get()
 if (localOnly.toBoolean()) {
     logger.warn("WARNING: Will only use Maven Local for XTC plugin/XDK artifacts.")
 }
@@ -37,7 +37,7 @@ xtcRun {
 // }
 
 // Print version information
-val printVersionInfo by tasks.registering {
+val printVersionInfo = tasks.register("printVersionInfo") {
     val xtcVersionTask = tasks.named<XtcVersionTask>("xtcVersion")
     dependsOn(xtcVersionTask)
     val xdkVersion = xtcVersionTask.flatMap { it.xdkVersion }
@@ -65,7 +65,7 @@ val printVersionInfo by tasks.registering {
  * it does not imply the full `build` lifecycle, so `testXtc` still requires `check`, `build`, or an
  * explicit `testXtc` invocation. This follows normal Gradle least-surprise lifecycle behavior.
  */
-val greet by tasks.registering {
+val greet = tasks.register("greet") {
     group = "application"
     description = "Publish a greeting, directed to the contents of the 'entityToGreet' property. If no such property exists, we will greet 'World'."
     dependsOn(printVersionInfo, tasks.runXtc)
