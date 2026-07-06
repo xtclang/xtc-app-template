@@ -6,7 +6,7 @@
  */
 
 pluginManagement {
-    val localOnly: String by settings
+    val localOnly = providers.gradleProperty("localOnly").get()
     repositories {
         // Add remote Maven repositories unless localOnly mode
         if (!localOnly.toBoolean()) {
@@ -31,7 +31,7 @@ plugins {
 
 @Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
-    val localOnly: String by settings
+    val localOnly = providers.gradleProperty("localOnly").get()
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         // Add remote Maven repositories unless localOnly mode
