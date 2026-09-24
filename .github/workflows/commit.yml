@@ -1,6 +1,6 @@
 name: Commit Verification
 
-on: push
+on: [push, pull_request]
 
 # Cancel in-progress runs of the same workflow
 concurrency:
