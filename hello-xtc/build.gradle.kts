@@ -15,9 +15,10 @@ dependencies {
 }
 
 xtcRun {
-    // Set detach to true to run the module in a background process that continues after Gradle exits.
-    // Output will be redirected to a timestamped log file in the project directory.
-    // detach = true
+    // To run the module in a background process that continues after Gradle exits, set the execution mode to
+    // DETACHED, here or with ./gradlew runXtc --mode=DETACHED. Its output then goes to timestamped log files
+    // under build/xtc.
+    // executionMode = org.xtclang.plugin.launchers.ExecutionMode.DETACHED
 
     // To run more modules in sequence, you can add more module sections after this one.
     module {
